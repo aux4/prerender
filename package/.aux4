@@ -1,0 +1,90 @@
+{
+  "scope": "aux4",
+  "name": "prerender",
+  "version": "0.0.1",
+  "description": "Turn a running SPA into per-route static HTML for SEO (hydration-safe prerendering, built on aux4/browser).",
+  "license": "Apache-2.0",
+  "git": "https://github.com/aux4/prerender",
+  "tags": [
+    "aux4",
+    "prerender",
+    "spa",
+    "seo",
+    "ssg",
+    "static",
+    "browser"
+  ],
+  "dependencies": [
+    "aux4/browser"
+  ],
+  "system": [
+    [
+      "test:node --version",
+      "brew:node",
+      "linux:nodejs"
+    ]
+  ],
+  "profiles": [
+    {
+      "name": "main",
+      "commands": [
+        {
+          "name": "prerender",
+          "execute": [
+            "profile:prerender"
+          ],
+          "help": {
+            "text": "Prerender a running SPA into per-route static HTML for SEO."
+          }
+        }
+      ]
+    },
+    {
+      "name": "prerender",
+      "commands": [
+        {
+          "name": "site",
+          "execute": [
+            "node ${packageDir}/lib/aux4-prerender.mjs site values(baseUrl, routes, output, waitUntil, settle, concurrency)"
+          ],
+          "help": {
+            "text": "Visit every route of a locally-served SPA and write each rendered page to <output>/<route>/index.html, keeping the script/asset tags intact for hydration.",
+            "variables": [
+              {
+                "name": "baseUrl",
+                "text": "Base URL of the built SPA served locally, e.g. http://localhost:4173",
+                "arg": true,
+                "default": ""
+              },
+              {
+                "name": "routes",
+                "text": "Route source: a sitemap.xml (local path OR URL) whose <loc> entries are the routes, OR an explicit comma/newline separated list of paths (e.g. \"/,/about,/pricing\").",
+                "default": ""
+              },
+              {
+                "name": "output",
+                "text": "Directory to write <route>/index.html into (typically the built dist).",
+                "default": ""
+              },
+              {
+                "name": "waitUntil",
+                "text": "Navigation wait strategy passed to the browser: domcontentloaded, load, networkidle, or settle.",
+                "default": "networkidle"
+              },
+              {
+                "name": "settle",
+                "text": "Extra delay in milliseconds after the page reaches network idle, before capturing the HTML.",
+                "default": "500"
+              },
+              {
+                "name": "concurrency",
+                "text": "Number of routes to prerender in parallel (one browser session each).",
+                "default": "4"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

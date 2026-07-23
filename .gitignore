@@ -1,0 +1,19 @@
+# Dependencies
+node_modules/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Local testing
+local-test
+*.zip
+
+# Local Claude settings
+.claude/
+
+# OS
+.DS_Store
+
+# IDE
+.idea
