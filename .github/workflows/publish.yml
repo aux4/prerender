@@ -57,9 +57,13 @@ jobs:
   # NOTE: the test jobs use aux4/test-package-action@v1 (composite, runs on the
   # host runner) rather than aux4/action@v1 command:test. aux4/action runs the
   # test suite inside the aux4 Docker image, which has no browser engine; prerender
-  # drives the aux4/browser daemon and needs the Playwright Chromium engine that we
-  # install on the runner below — so tests must run on the host, exactly like the
-  # aux4/browser package's own CI. lint and publish still use aux4/action@v1.
+  # drives the aux4/browser daemon, which launches Chromium at daemon start — so the
+  # tests must run on the host, exactly like the aux4/browser package's own CI.
+  # The daemon uses the Playwright version BUNDLED inside aux4/browser, so we must
+  # install the Chromium revision that matches THAT bundled Playwright (not an
+  # arbitrary npx-latest one, which mismatches and makes the daemon fail to start).
+  # We therefore install aux4/browser first and drive its own bundled Playwright CLI
+  # to fetch the exact matching Chromium. lint and publish still use aux4/action@v1.
   test-linux:
     needs: [lint]
     runs-on: ubuntu-latest
@@ -75,8 +79,15 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Install Playwright Chromium
-        run: npx playwright install --with-deps chromium
+      - name: Install aux4/browser + matching Chromium
+        shell: bash
+        run: |
+          curl -fsSL https://aux4.sh | sh
+          echo "$HOME/.aux4.config/packages/aux4/aux4" >> "$GITHUB_PATH"
+          export PATH="$HOME/.aux4.config/packages/aux4/aux4:$PATH"
+          curl -fsSL https://pkger.aux4.sh | sh
+          aux4 aux4 pkger install aux4/browser
+          node "$HOME/.aux4.config/packages/aux4/browser/lib/node_modules/playwright/cli.js" install --with-deps chromium
 
       - name: Test
         uses: aux4/test-package-action@v1
@@ -98,8 +109,15 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Install Playwright Chromium
-        run: npx playwright install chromium
+      - name: Install aux4/browser + matching Chromium
+        shell: bash
+        run: |
+          curl -fsSL https://aux4.sh | sh
+          echo "$HOME/.aux4.config/packages/aux4/aux4" >> "$GITHUB_PATH"
+          export PATH="$HOME/.aux4.config/packages/aux4/aux4:$PATH"
+          curl -fsSL https://pkger.aux4.sh | sh
+          aux4 aux4 pkger install aux4/browser
+          node "$HOME/.aux4.config/packages/aux4/browser/lib/node_modules/playwright/cli.js" install chromium
 
       - name: Test
         uses: aux4/test-package-action@v1
