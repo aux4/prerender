@@ -54,6 +54,12 @@ jobs:
           command: lint
           strict: 'true'
 
+  # NOTE: the test jobs use aux4/test-package-action@v1 (composite, runs on the
+  # host runner) rather than aux4/action@v1 command:test. aux4/action runs the
+  # test suite inside the aux4 Docker image, which has no browser engine; prerender
+  # drives the aux4/browser daemon and needs the Playwright Chromium engine that we
+  # install on the runner below — so tests must run on the host, exactly like the
+  # aux4/browser package's own CI. lint and publish still use aux4/action@v1.
   test-linux:
     needs: [lint]
     runs-on: ubuntu-latest
@@ -69,15 +75,12 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      # prerender drives the aux4/browser daemon (a dependency), which needs the
-      # Playwright Chromium engine present on the runner. Mirrors aux4/browser CI.
       - name: Install Playwright Chromium
         run: npx playwright install --with-deps chromium
 
       - name: Test
-        uses: aux4/action@v1
+        uses: aux4/test-package-action@v1
         with:
-          command: test
           build_command: npm run build
 
   test-darwin:
@@ -99,9 +102,8 @@ jobs:
         run: npx playwright install chromium
 
       - name: Test
-        uses: aux4/action@v1
+        uses: aux4/test-package-action@v1
         with:
-          command: test
           build_command: npm run build
 
   publish:
