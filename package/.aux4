@@ -1,7 +1,7 @@
 {
   "scope": "aux4",
   "name": "prerender",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Turn a running SPA into per-route static HTML for SEO (hydration-safe prerendering, built on aux4/browser).",
   "license": "Apache-2.0",
   "git": "https://github.com/aux4/prerender",
