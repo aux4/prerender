@@ -141,13 +141,18 @@ async function renderRoute(session, baseUrl, routePath, output, waitUntil, settl
   );
   if (settle > 0) await sleep(settle);
 
+  // Before serializing, flush any CSS-in-JS rules (emotion / styled-components /
+  // MUI) that were injected via CSSOM insertRule into their <style> tags. Those
+  // rules live only in document.styleSheets, not in the DOM, so outerHTML would
+  // otherwise drop them — shipping elements with css-* classNames but no rules,
+  // which flashes unstyled until the JS re-injects them on hydration.
   let html = await sh("aux4", [
     "browser",
     "eval",
     "--session",
     session,
     "--script",
-    "document.documentElement.outerHTML"
+    "(function(){try{for(var i=0;i<document.styleSheets.length;i++){var s=document.styleSheets[i],n=s.ownerNode;if(n&&n.tagName==='STYLE'&&!n.textContent){var r=s.cssRules,c='';for(var j=0;j<r.length;j++)c+=r[j].cssText;if(c)n.textContent=c;}}}catch(e){}return document.documentElement.outerHTML;})()"
   ]);
   html = html.replace(/\s+$/, "");
   if (!html) throw new Error("empty HTML captured");
