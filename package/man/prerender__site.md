@@ -78,7 +78,7 @@ Prerendering 1 route(s) from https://example.com into out
 Prerendered 1/1 route(s)
 ```
 
-CI pattern used by `docs.aux4.io` and the other aux4 SPAs — build the SPA, serve the built `dist` locally, then prerender the built sitemap back into `dist` so CI never reaches out to any external site:
+A typical CI pattern — build the SPA, serve the built `dist` locally, then prerender the built sitemap back into `dist` so CI never reaches out to any external site:
 
 ```bash
 npm run build                      # produces dist/ + dist/sitemap.xml

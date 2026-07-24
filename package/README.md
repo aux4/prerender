@@ -4,7 +4,7 @@ Turn a running Single Page Application into per-route static HTML for SEO — hy
 
 React (and other client-rendered) SPAs ship an empty `<div id="root"></div>` shell and render everything in the browser. Crawlers and social scrapers that do not run JavaScript therefore see no content, no per-page title, and no meta tags. `aux4/prerender` fixes that: it drives a headless browser to each route of your locally-served build, waits for the client render to finish, and writes the fully-rendered HTML back into your `dist` — while keeping the `<script>`/asset tags intact so the SPA still boots and hydrates for real visitors.
 
-It is designed for SPAs hosted on the `terraform-aws-website` (S3 + CloudFront) stack, where `/route/index.html` files are served directly and unknown paths fall back to the SPA — so trailing-slash `<route>/index.html` snapshots drop straight in.
+It works well with static hosts (e.g. S3 + CloudFront) where `/route/index.html` files are served directly and unknown paths fall back to the SPA — so trailing-slash `<route>/index.html` snapshots drop straight in.
 
 ## Installation
 
@@ -99,9 +99,9 @@ Prerendered 1/1 route(s)
 
 The same works with a single inline route — `--routes "/"` prerenders just the home page — or a comma-separated list, e.g. `--routes "/,/about"`.
 
-## docs.aux4.io CI pattern
+## CI pattern
 
-`docs.aux4.io` (and the other aux4 React SPAs on the `terraform-aws-website` stack) prerender in CI by building the SPA, serving the built `dist` locally, and pointing `prerender site` at that local server with the built sitemap:
+A typical CI flow prerenders by building the SPA, serving the built `dist` locally, and pointing `prerender site` at that local server with the built sitemap:
 
 ```bash
 # 1. build the SPA to dist (includes dist/sitemap.xml)
