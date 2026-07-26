@@ -1,6 +1,9 @@
 # Dependencies
 node_modules/
 
+# Generated build output (rollup: src/executable.js -> package/lib), rebuilt in CI
+package/lib/
+
 # Logs
 *.log
 npm-debug.log*
